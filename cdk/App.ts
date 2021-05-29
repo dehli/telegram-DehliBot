@@ -2,9 +2,13 @@ import * as cdk from "monocdk";
 import * as path from "path";
 
 const {
-  TELEGRAM_API_TOKEN = "",
+  TELEGRAM_API_TOKEN,
   TELEGRAM_CHAT_ID = ""
 } = process.env;
+
+if (!TELEGRAM_API_TOKEN) {
+  throw new Error("Missing TELEGRAM_API_TOKEN");
+}
 
 const app = new cdk.App();
 const stack = new cdk.Stack(app, "Telegram-DehliBot");
@@ -30,11 +34,18 @@ const telegramIntegration = new cdk.aws_apigatewayv2_integrations.LambdaProxyInt
   })
 });
 
-const api = new cdk.aws_apigatewayv2.HttpApi(stack, "Api");
+const webhookPath = TELEGRAM_API_TOKEN.replace(":", "/");
+
+const api = new cdk.aws_apigatewayv2.HttpApi(stack, "DehliBotApi");
 api.addRoutes({
-  path: "/telegram",
+  path: "/" + webhookPath,
   methods: [cdk.aws_apigatewayv2.HttpMethod.POST],
   integration: telegramIntegration
+});
+
+new cdk.CfnOutput(stack, "DehliBotApiOutput", {
+  exportName: `${cdk.Aws.STACK_NAME}-Webhook`,
+  value: api.url + webhookPath
 });
 
 app.synth();
