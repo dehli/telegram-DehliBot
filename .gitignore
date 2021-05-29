@@ -1,0 +1,5 @@
+.env
+*.js
+*.d.ts
+cdk.out/
+node_modules/
