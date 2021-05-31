@@ -1,8 +1,13 @@
 import * as telegram from "./telegram";
 import * as twitter from "./twitter";
 
+const apiToken = process.env.TELEGRAM_API_TOKEN;
+if (!apiToken) {
+  throw new Error("Missing TELEGRAM_API_TOKEN");
+}
+
 (async () => {
-  await telegram.post("setMyCommands", {
+  await telegram.post(apiToken)("setMyCommands", {
     commands: [
       { command: "echo", description: "Send request back." },
       { command: "twitter", description: "Check whether twitter handle is taken." }
@@ -24,7 +29,7 @@ export const handler = async (event: any) => {
   if (text.startsWith("/echo")) {
     const message = JSON.stringify(body, null, 2);
 
-    await telegram.post("sendMessage", {
+    await telegram.post(apiToken)("sendMessage", {
       chat_id: chat.id,
       entities: [
         { offset: 0, length: message.length, type: "code" }
@@ -38,7 +43,7 @@ export const handler = async (event: any) => {
     const username = twitterMatch[1];
     const available = await twitter.usernameAvailable(username);
 
-    await telegram.post("sendMessage", {
+    await telegram.post(apiToken)("sendMessage", {
       chat_id: chat.id,
       text: `${username} available: ${available}`
     });

@@ -1,8 +1,7 @@
 import bent from "bent";
-import * as consts from "./constants";
 
-export const post = bent(
-  `https://api.telegram.org/bot${consts.apiToken}/`,
+export const post = (apiToken: string) => bent(
+  `https://api.telegram.org/bot${apiToken}/`,
   "POST",
   "json",
   200
