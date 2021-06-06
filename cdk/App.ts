@@ -13,11 +13,10 @@ if (!TELEGRAM_API_TOKEN) {
 const app = new cdk.App();
 const stack = new cdk.Stack(app, "Telegram-DehliBot");
 
-const projectRoot = path.resolve(__dirname, "../../");
-
 const codeFromPath = (relativePath: string) =>
-  cdk.aws_lambda.Code.fromAsset(path.resolve(projectRoot, relativePath));
+  cdk.aws_lambda.Code.fromAsset(path.resolve(__dirname, "../../", relativePath));
 
+const functionHandler = (file: string) => `handlers/${file}.handler`;
 const functionProps = {
   code: codeFromPath("./out/src"),
   environment: {
@@ -35,14 +34,13 @@ const functionProps = {
   timeout: cdk.Duration.seconds(29),
 };
 
+const webhookPath = TELEGRAM_API_TOKEN.replace(":", "/");
 const webhookIntegration = new cdk.aws_apigatewayv2_integrations.LambdaProxyIntegration({
   handler: new cdk.aws_lambda.Function(stack, "TelegramFunction", {
     ...functionProps,
-    handler: "handlers/webhook.handler",
+    handler: functionHandler("webhook"),
   }),
 });
-
-const webhookPath = TELEGRAM_API_TOKEN.replace(":", "/");
 
 const api = new cdk.aws_apigatewayv2.HttpApi(stack, "DehliBotApi");
 api.addRoutes({
@@ -54,7 +52,7 @@ api.addRoutes({
 const setWebhookProvider = new cdk.custom_resources.Provider(stack, "SetWebhookProvider", {
   onEventHandler: new cdk.aws_lambda.Function(stack, "SetWebhookFunction", {
     ...functionProps,
-    handler: "handlers/setWebhook.handler",
+    handler: functionHandler("setWebhook"),
     memorySize: undefined,
   }),
   logRetention: cdk.aws_logs.RetentionDays.ONE_DAY,
@@ -70,7 +68,7 @@ new cdk.aws_events.Rule(stack, "DailyMessageRule", {
     new cdk.aws_events_targets.LambdaFunction(
       new cdk.aws_lambda.Function(stack, "DailyMessageFunction", {
         ...functionProps,
-        handler: "handlers/sendDailyMessage.handler",
+        handler: functionHandler("sendDailyMessage"),
       }),
     ),
   ],
