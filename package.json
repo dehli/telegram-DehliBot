@@ -10,7 +10,9 @@
   },
   "scripts": {
     "build": "tsc -p ./",
-    "deploy": "npx cdk deploy"
+    "clean": "rm -rf out",
+    "deploy": "npx cdk deploy",
+    "predeploy": "npm run clean && npm run build"
   },
   "name": "DehliBot"
 }
