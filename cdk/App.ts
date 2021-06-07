@@ -63,7 +63,7 @@ new cdk.CustomResource(stack, "SetWebhookResource", {
 });
 
 new cdk.aws_events.Rule(stack, "DailyMessageRule", {
-  schedule: cdk.aws_events.Schedule.cron({ hour: "5", minute: "0" }),
+  schedule: cdk.aws_events.Schedule.cron({ hour: "13", minute: "0" }),
   targets: [
     new cdk.aws_events_targets.LambdaFunction(
       new cdk.aws_lambda.Function(stack, "DailyMessageFunction", {
