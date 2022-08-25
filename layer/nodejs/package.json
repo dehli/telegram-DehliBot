@@ -1,9 +1,8 @@
 {
   "dependencies": {
     "bent": "^7.3.12",
-    "chrome-aws-lambda": "9.1.0",
-    "lambdafs": "~2.0.3",
-    "puppeteer-core": "^9.1.1"
+    "chrome-aws-lambda": "10.1.0",
+    "puppeteer-core": "^10.1.0"
   },
   "name": "DehliBot-Layer"
 }

@@ -3,11 +3,13 @@ import * as path from "path";
 
 const {
   TELEGRAM_API_TOKEN,
-  TELEGRAM_CHAT_ID = "",
+  TELEGRAM_CHAT_ID,
 } = process.env;
 
 if (!TELEGRAM_API_TOKEN) {
   throw new Error("Missing TELEGRAM_API_TOKEN");
+} else if (!TELEGRAM_CHAT_ID) {
+  throw new Error("Missing TELEGRAM_CHAT_ID");
 }
 
 const app = new cdk.App();
@@ -35,12 +37,13 @@ const functionProps = {
 };
 
 const webhookPath = TELEGRAM_API_TOKEN.replace(":", "/");
-const webhookIntegration = new cdk.aws_apigatewayv2_integrations.LambdaProxyIntegration({
-  handler: new cdk.aws_lambda.Function(stack, "TelegramFunction", {
+const webhookIntegration = new cdk.aws_apigatewayv2_integrations.HttpLambdaIntegration(
+  "WebhookIntegration",
+  new cdk.aws_lambda.Function(stack, "TelegramFunction", {
     ...functionProps,
     handler: functionHandler("webhook"),
   }),
-});
+);
 
 const api = new cdk.aws_apigatewayv2.HttpApi(stack, "DehliBotApi");
 api.addRoutes({
